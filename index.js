@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const bcrypt = require('bcrypt');
 const app = express();
 const port = process.env.PORT || 5000;
@@ -28,6 +28,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7
 
     const usersCollection = client.db("tasteTailDB").collection("Users");
+    const categoriesCollection = client.db("tasteTailDB").collection("Category");
 
     app.get("/user", async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -72,6 +73,18 @@ async function run() {
       const newData = {password: hashPassword, ...remain};
       const result = await usersCollection.insertOne(newData);
       res.status(200).send(result);
+    })
+
+    // category
+    app.get("/category", async (req, res) => {
+      const result = await categoriesCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.post("/category", async (req, res) => {
+      const category = req.body;
+      const result = await categoriesCollection.insertOne(category);
+      res.send(result);
     })
 
 
