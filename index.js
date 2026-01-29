@@ -113,6 +113,13 @@ async function run() {
     })
 
     // recipes
+    app.get("/recipe", async (req, res) => {
+
+      const result = await recipesCollection.find().toArray();
+
+      res.send(result);
+    });
+
     app.get("/recipe/:id", async (req, res) => {
       const id = req.params.id;
 
@@ -123,10 +130,46 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/recipe/:id", async (req, res) => {
+      const id = req.params.id;
+      const recipe = req.body;
+      console.log(id, recipe)
+
+      // Remove _id to avoid updating it
+      const { _id, ...updateData } = recipe;
+
+      const updateDoc = {
+        $set: updateData
+      };
+
+      try {
+        const result = await recipesCollection.updateOne(
+          { _id: new ObjectId(id) },
+          updateDoc
+        );
+
+        console.log(result)
+
+        res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to update recipe" });
+      }
+    });
+
+
+
     app.post("/recipe", async (req, res) => {
       const data = req.body;
       const result = await recipesCollection.insertOne(data);
       res.send(result);
+    })
+
+    app.delete("/recipe/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await recipesCollection.deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+
     })
 
 
