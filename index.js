@@ -29,6 +29,7 @@ async function run() {
 
     const usersCollection = client.db("tasteTailDB").collection("Users");
     const categoriesCollection = client.db("tasteTailDB").collection("Category");
+    const recipesCollection = client.db("tasteTailDB").collection("Recipes");
 
     app.get("/user", async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -109,6 +110,14 @@ async function run() {
       const result = await categoriesCollection.deleteOne({_id: new ObjectId(id)});
       res.send(result);
 
+    })
+
+    // recipes
+
+    app.post("/recipe", async (req, res) => {
+      const data = req.body;
+      const result = await recipesCollection.insertOne(data);
+      res.send(result);
     })
 
 
