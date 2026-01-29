@@ -30,6 +30,7 @@ async function run() {
     const usersCollection = client.db("tasteTailDB").collection("Users");
     const categoriesCollection = client.db("tasteTailDB").collection("Category");
     const recipesCollection = client.db("tasteTailDB").collection("Recipes");
+    const reviewsCollection = client.db("tasteTailDB").collection("Reviews");
 
     app.get("/user", async (req, res) => {
       const result = await usersCollection.find().toArray();
@@ -193,6 +194,50 @@ async function run() {
       res.send(result);
 
     })
+
+    // reviews
+    app.get("/reviews", async (req, res) => {
+      const { recipeId } = req.params;
+
+      const reviews = await reviewsCollection
+        .find({ status: "pending" })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      res.send(reviews);
+    });
+
+
+    app.get("/reviews/:recipeId", async (req, res) => {
+      const { recipeId } = req.params;
+
+      const reviews = await reviewsCollection
+        .find({ recipeId, status: "approved" })
+        .sort({ createdAt: -1 })
+        .toArray();
+
+      res.send(reviews);
+    });
+
+    app.put("/reviews/approve/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await reviewsCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { status: "approved" } }
+      );
+
+      res.send(result);
+    });
+
+
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+
+      const result = await reviewsCollection.insertOne(review);
+
+      res.send(result);
+    });
 
 
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
