@@ -36,6 +36,28 @@ async function run() {
       res.send(result);
     })
 
+    // PUT /users/:id/role
+    app.put("/users/:id/role", async (req, res) => {
+      const { id } = req.params;
+      const { role } = req.body; // "admin" or "moderator"
+
+      if (!["admin", "moderator"].includes(role)) {
+        return res.status(400).send({ error: "Invalid role" });
+      }
+
+      try {
+        const result = await usersCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { role } }
+        );
+        res.send(result);
+      } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: "Failed to update role" });
+      }
+    });
+
+
     // login system
     app.post("/loginPoint", async (req, res) => {
       const { email, password } = req.body;
