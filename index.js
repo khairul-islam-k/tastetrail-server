@@ -81,6 +81,23 @@ async function run() {
       res.send(result);
     })
 
+    app.get("/categoryOne/:id", async (req, res) => {
+      const {id} = req.params;
+      const result = await categoriesCollection.findOne({_id: new ObjectId(id)});
+      res.send(result);
+    })
+
+    app.patch("/category/:id", async (req, res) => {
+      const {id} = req.params;
+      const data = req.body;
+      const result = await categoriesCollection.updateOne(
+        {_id: new ObjectId(id)},
+        {$set: data}
+      );
+
+      res.send(result);
+    })
+
     app.post("/category", async (req, res) => {
       const category = req.body;
       const result = await categoriesCollection.insertOne(category);
