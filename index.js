@@ -38,8 +38,8 @@ async function run() {
 
     // login system
     app.post("/loginPoint", async (req, res) => {
-      const {email, password} = req.body;
-      const user = await usersCollection.findOne({email});
+      const { email, password } = req.body;
+      const user = await usersCollection.findOne({ email });
 
       if (!user) {
         res.send(null);
@@ -47,13 +47,13 @@ async function run() {
       }
 
       const isPassword = await bcrypt.compare(password, user?.password);
-      
+
       if (isPassword) {
         res.send(user);
-      }else{
+      } else {
         res.send(null);
       }
-      
+
     })
 
     // registration
@@ -69,9 +69,9 @@ async function run() {
         return;
       }
 
-      const {password, ...remain} = data;
+      const { password, ...remain } = data;
       const hashPassword = await bcrypt.hash(password, 10);
-      const newData = {password: hashPassword, ...remain};
+      const newData = { password: hashPassword, ...remain };
       const result = await usersCollection.insertOne(newData);
       res.status(200).send(result);
     })
@@ -83,17 +83,17 @@ async function run() {
     })
 
     app.get("/categoryOne/:id", async (req, res) => {
-      const {id} = req.params;
-      const result = await categoriesCollection.findOne({_id: new ObjectId(id)});
+      const { id } = req.params;
+      const result = await categoriesCollection.findOne({ _id: new ObjectId(id) });
       res.send(result);
     })
 
     app.patch("/category/:id", async (req, res) => {
-      const {id} = req.params;
+      const { id } = req.params;
       const data = req.body;
       const result = await categoriesCollection.updateOne(
-        {_id: new ObjectId(id)},
-        {$set: data}
+        { _id: new ObjectId(id) },
+        { $set: data }
       );
 
       res.send(result);
@@ -106,13 +106,22 @@ async function run() {
     })
 
     app.delete("/category/:id", async (req, res) => {
-      const {id} = req.params;
-      const result = await categoriesCollection.deleteOne({_id: new ObjectId(id)});
+      const { id } = req.params;
+      const result = await categoriesCollection.deleteOne({ _id: new ObjectId(id) });
       res.send(result);
 
     })
 
     // recipes
+    app.get("/recipe/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const result = await recipesCollection.findOne({
+        _id: new ObjectId(id)
+      });
+
+      res.send(result);
+    });
 
     app.post("/recipe", async (req, res) => {
       const data = req.body;
